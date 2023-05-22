@@ -1,0 +1,29 @@
+from qiskit import QuantumCircuit, Aer, execute
+
+# Datos de ejemplo
+user_preferences = [0, 1, 0, 1]  # Preferencias del usuario para ítems específicos
+
+# Crear el circuito cuántico
+num_items = len(user_preferences)
+qc = QuantumCircuit(num_items, num_items)
+
+# Inicialización de los qubits
+for i, preference in enumerate(user_preferences):
+    if preference == 1:
+        qc.x(i)
+
+# Aplicar una compuerta Hadamard a todos los qubits
+qc.h(range(num_items))
+
+# Medición de los qubits
+qc.measure(range(num_items), range(num_items))
+
+# Ejecutar el circuito cuántico en el simulador
+simulator = Aer.get_backend('qasm_simulator')
+job = execute(qc, simulator, shots=1000)
+result = job.result()
+counts = result.get_counts()
+
+# Filtrar las recomendaciones basadas en las mediciones cuánticas
+recommendations = [item for item, count in counts.items() if count > 0]
+print("Recomendaciones:", recommendations)
